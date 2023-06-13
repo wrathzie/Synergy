@@ -1,0 +1,11 @@
+﻿#Задание 2
+print('Введите этапы развития человека по порядку' + '.')
+a = input()
+b = input()
+c = input()
+d = input()
+e = input()
+f = input()
+g = input()
+h = input()
+print(a,b,c,d,e,f,g,h, sep='=>')
