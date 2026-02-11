@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bookstore</title>
+    <!-- Import Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        /* Add some padding to the panels */
+        #adminPanel, #userPanel {
+            padding: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="container">
+    <h1 class="center-align">Bookstore</h1>
+
+    <div class="center-align">
+        <button class="btn waves-effect waves-light" onclick="showPanel('admin')">Administrator</button>
+        <button class="btn waves-effect waves-light" onclick="showPanel('user')">User</button>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="card-panel">
+        <h2>Administrator Panel</h2>
+        <select id="sortOptionAdmin" class="browser-default" onchange="sortBooks()">
+            <option value="category">Category</option>
+            <option value="author">Author</option>
+            <option value="year">Year</option>
+        </select>
+        <button class="btn waves-effect waves-light" onclick="addBook()">Add Book</button>
+        <button class="btn waves-effect waves-light" onclick="sendReminder()">Send Rental Expiration Reminder</button>
+        <div id="adminBookList"></div>
+    </div>
+
+    <!-- User Panel -->
+    <div id="userPanel" class="card-panel">
+        <h2>User Panel</h2>
+        <select id="sortOption" class="browser-default" onchange="sortBooks()">
+            <option value="category">Category</option>
+            <option value="author">Author</option>
+            <option value="year">Year</option>
+        </select>
+        <div id="bookList"></div>
+    </div>
+</div>
+
+<!-- Import Materialize JS and initialize select elements -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+<script>
+    // Simulated book database
+    const books = [
+        {title: "Book 1", author: "Author 1", category: "Fiction", year: 1990, price: 10, status: "Available"},
+        {title: "Book 2", author: "Author 2", category: "Non-fiction", year: 2000, price: 15, status: "Available"},
+        {title: "Book 3", author: "Author 3", category: "Fiction", year: 2010, price: 20, status: "Available"},
+        {title: "Book 4", author: "Author 4", category: "Non-fiction", year: 2020, price: 25, status: "Available"},
+        {title: "Book 5", author: "Author 5", category: "Fiction", year: 1995, price: 30, status: "Available"},
+        {title: "Book 6", author: "Author 6", category: "Non-fiction", year: 2005, price: 35, status: "Available"},
+    ];
+
+    // Simulated rental database
+    const rentals = [];
+
+    // Show the appropriate panel
+    function showPanel(panel) {
+        document.getElementById('adminPanel').style.display = 'none';
+        document.getElementById('userPanel').style.display = 'none';
+
+        if (panel === 'admin') {
+            document.getElementById('adminPanel').style.display = 'block';
+            displayAdminBooks();
+        } else if (panel === 'user') {
+            document.getElementById('userPanel').style.display = 'block';
+            displayBooks();
+        }
+    }
+
+    // Display books in the User Panel
+    function displayBooks() {
+        const bookList = document.getElementById('bookList');
+        bookList.innerHTML = "";
+        books.forEach((book, index) => {
+            bookList.innerHTML += `
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">${book.title}</span>
+                    <p>Author: ${book.author}<br>
+                    Category: ${book.category}<br>
+                    Year: ${book.year}<br>
+                    Price: ${book.price}</p>
+                </div>
+                <div class="card-action">
+                    <button class="btn-small waves-effect waves-light" onclick="buyOrRentBook(${index})">Buy/Rent</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    function displayAdminBooks() {
+        const adminBookList = document.getElementById('adminBookList');
+        adminBookList.innerHTML = "";
+        books.forEach((book, index) => {
+            adminBookList.innerHTML += `
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">${book.title}</span>
+                    <p>Author: ${book.author}<br>
+                    Category: ${book.category}<br>
+                    Year: ${book.year}<br>
+                    Price: ${book.price}<br>
+                    Status: ${book.status}</p>
+                </div>
+                <div class="card-action">
+                    <button class="btn-small waves-effect waves-light" onclick="updateBook(${index})">Update</button>
+                    <button class="btn-small waves-effect waves-light" onclick="changeStatus(${index})">Change Status</button>
+                </div>
+            </div>`;
+        });
+    }
+
+
+    function updateBook(index) {
+        // Update the details of the existing book
+        const bookToUpdate = books[index];
+        bookToUpdate.title = prompt("Update title:", bookToUpdate.title);
+        bookToUpdate.author = prompt("Update author:", bookToUpdate.author);
+        bookToUpdate.category = prompt("Update category:", bookToUpdate.category);
+        bookToUpdate.year = parseInt(prompt("Update year:", bookToUpdate.year), 10);
+        bookToUpdate.price = parseFloat(prompt("Update price:", bookToUpdate.price));
+        displayAdminBooks();
+    }
+
+    function changeStatus(index) {
+        // Change the availability status of the book
+        const bookToUpdate = books[index];
+        bookToUpdate.status = prompt("Update status:", bookToUpdate.status);
+        displayAdminBooks();
+    }
+
+    function sendReminder() {
+        // Send reminders for rental expiration
+        const now = new Date();
+        rentals.forEach((rental) => {
+            if (rental.expiryDate < now) {
+                alert(`Rental period expired for ${rental.book.title}. Notify user: ${rental.userId}`);
+            }
+        });
+    }
+
+
+    // Buy or Rent a book
+    function buyOrRentBook(index) {
+        const period = prompt("Rent for how long? (2 weeks / 1 month / 3 months)");
+        alert(`You have rented ${books[index].title} for ${period}.`);
+        // Implement additional logic like updating availability status
+    }
+
+    // Add a new book (Admin Panel)
+    function addBook() {
+        const title = prompt("Enter book title:");
+        const author = prompt("Enter book author:");
+        const category = prompt("Enter book category:");
+        const year = prompt("Enter year written:");
+        const price = prompt("Enter price:");
+        books.push({title, author, category, year: parseInt(year, 10), price: parseFloat(price)});
+    }
+
+    // Update Prices (Admin Panel)
+    function updatePrices() {
+        const percentage = prompt("Increase prices by (%) :");
+        books.forEach(book => {
+            book.price *= (1 + (parseFloat(percentage) / 100));
+        });
+    }
+
+    // Sort books based on selected criteria
+    function sortBooks() {
+        let sortOption;
+
+        // Check which panel is open
+        if (document.getElementById('userPanel').style.display === 'block') {
+            sortOption = document.getElementById('sortOption').value;
+            books.sort((a, b) => {
+                if (a[sortOption] < b[sortOption]) return -1;
+                if (a[sortOption] > b[sortOption]) return 1;
+                return 0;
+            });
+            displayBooks();
+        } else if (document.getElementById('adminPanel').style.display === 'block') {
+            sortOption = document.getElementById('sortOptionAdmin').value;
+            books.sort((a, b) => {
+                if (a[sortOption] < b[sortOption]) return -1;
+                if (a[sortOption] > b[sortOption]) return 1;
+                return 0;
+            });
+            displayAdminBooks();
+        }
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Container styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F5F5F5;
+        }
+        #login-section, #post-section {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        /* Input and button styles */
+        input, textarea, button {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            cursor: pointer;
+            background-color: #6200EA;
+            color: white;
+        }
+
+        /* Post list styles */
+        #post-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        #post-list li {
+            padding: 12px;
+            background-color: white;
+            margin: 8px 0;
+            border-radius: 4px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+
+    <title>Blog App</title>
+    <script>
+        // Initialize empty user list and empty post list
+        let users = [];
+        let posts = [];
+        let currentUser = null;
+
+        // Register new user
+        function register() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            users.push({username, password});
+            alert("Registered!");
+        }
+
+        // Login function
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            currentUser = users.find(user => user.username === username && user.password === password);
+            if(currentUser) {
+                alert("Logged in!");
+                document.getElementById("login-section").style.display = "none";
+                document.getElementById("post-section").style.display = "block";
+            } else {
+                alert("Invalid credentials");
+            }
+        }
+
+        // Create new post
+        function createPost() {
+            const content = document.getElementById("post-content").value;
+            const newPost = { content, author: currentUser.username, comments: [], tags: [] };
+            posts.push(newPost);
+            displayPosts();
+        }
+
+        // Function to display posts
+        function displayPosts(sortedPosts = null) {
+            const postList = document.getElementById("post-list");
+            postList.innerHTML = "";
+            const displayPostsArray = sortedPosts || posts;
+            displayPostsArray.forEach((post, index) => {
+                const postItem = document.createElement("li");
+                postItem.innerText = `${post.content} (Author: ${post.author}) Tags: ${post.tags ? post.tags.join(',') : 'None'}`;
+
+                // Edit button
+                const editButton = document.createElement("button");
+                editButton.innerText = "Edit";
+                editButton.onclick = function() { editPost(index); };
+
+                // Delete button
+                const deleteButton = document.createElement("button");
+                deleteButton.innerText = "Delete";
+                deleteButton.onclick = function() { deletePost(index); };
+
+                // Add Tags button
+                const addTagsButton = document.createElement("button");
+                addTagsButton.innerText = "Add Tags";
+                addTagsButton.onclick = function() { addTags(index); };
+
+                // Add Comment button
+                const addCommentButton = document.createElement("button");
+                addCommentButton.innerText = "Add Comment";
+                addCommentButton.onclick = function() { addComment(index); };
+
+                postItem.appendChild(editButton);
+                postItem.appendChild(deleteButton);
+                postItem.appendChild(addTagsButton);
+                postItem.appendChild(addCommentButton);
+
+                // Display comments if any
+                if (post.comments && post.comments.length > 0) {
+                    const commentList = document.createElement("ul");
+                    post.comments.forEach(comment => {
+                        const commentItem = document.createElement("li");
+                        commentItem.innerText = `${comment.content} (Author: ${comment.author})`;
+                        commentList.appendChild(commentItem);
+                    });
+                    postItem.appendChild(commentList);
+                }
+
+                postList.appendChild(postItem);
+            });
+        }
+
+        // Delete a post
+        function deletePost(index) {
+            posts.splice(index, 1);
+            displayPosts();
+        }
+
+        // Function to add a comment
+        function addComment(index) {
+            const comment = prompt("Add your comment:");
+            if (comment) {
+                if (!posts[index].comments) {
+                    posts[index].comments = [];
+                }
+                posts[index].comments.push({ author: currentUser.username, content: comment });
+                displayPosts();
+            }
+        }
+
+        function subscribeToUser() {
+            const usernameToSubscribe = document.getElementById("subscribe-username").value;
+            const user = users.find(user => user.username === usernameToSubscribe);
+            if (user && currentUser) {
+                currentUser.subscriptions.push(user.username);
+                alert("Subscribed!");
+            } else {
+                alert("User not found!");
+            }
+        }
+
+        function generateFeed() {
+            const feed = [];
+            currentUser.subscriptions.forEach(userId => {
+                const userPosts = posts.filter(post => post.userId === userId);
+                feed.push(...userPosts);
+            });
+
+            displayPosts(feed);
+        }
+
+        function viewPublicPosts() {
+            const publicPosts = posts.filter(post => !post.isPrivate);
+            displayPosts(publicPosts);
+        }
+
+        // Function for creating hidden posts
+        function createHiddenPost() {
+            const content = document.getElementById("hidden-post-content").value;
+            const newPost = { content, author: currentUser.username, isHidden: true };
+            posts.push(newPost);
+            displayPosts();
+        }
+
+        // Function to edit a post
+        function editPost(index) {
+            const newContent = prompt("Enter new content:", posts[index].content);
+            if (newContent !== null) {
+                posts[index].content = newContent;
+                displayPosts();
+            }
+        }
+
+        // Function to add tags to a post
+        function addTags(index) {
+            const newTags = prompt("Enter tags separated by commas:", posts[index].tags ? posts[index].tags.join(',') : '');
+            if (newTags !== null) {
+                posts[index].tags = newTags.split(',').map(tag => tag.trim());
+                displayPosts();
+            }
+        }
+
+        // Function to sort posts by tags
+        function sortPostsByTags() {
+            const tagToSortBy = document.getElementById("sort-tag").value;
+            const sortedPosts = posts.filter(post => post.tags && post.tags.includes(tagToSortBy));
+            displayPosts(sortedPosts);
+        }
+    </script>
+</head>
+<body>
+
+<!-- Registration and Login -->
+<div id="login-section">
+    <input id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+</div>
+
+<!-- Subscription -->
+<div id="subscribe-section" style="display: none;">
+    <input id="subscribe-username" placeholder="Username to Subscribe" />
+    <button onclick="subscribeToUser()">Subscribe</button>
+</div>
+
+<!-- Post creation -->
+<div id="post-section" style="display: none;">
+    <textarea id="post-content" placeholder="Write your post here"></textarea>
+    <button onclick="createPost()">Create Public Post</button>
+    <textarea id="hidden-post-content" placeholder="Write your hidden post here"></textarea>
+    <button onclick="createHiddenPost()">Create Hidden Post</button>
+</div>
+
+<!-- Sort Posts by Tags -->
+<div id="sort-section" style="display: none;">
+    <input id="sort-tag" placeholder="Enter tag to sort by" />
+    <button onclick="sortPostsByTags()">Sort</button>
+</div>
+
+<!-- Display posts -->
+<ul id="post-list">
+</ul>
+
+</body>
+</html>

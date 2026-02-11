@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Management Tool</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script>
+        // Simulate a database using a pre-generated array
+        const projects = [
+            { id: 1, name: 'Project A1', status: 'In Progress', process: 'Design' },
+            { id: 2, name: 'Project B1', status: 'Completed', process: 'Development' },
+            { id: 3, name: 'Project C1', status: 'Planned', process: 'Planning' },
+            { id: 4, name: 'Project A2', status: 'Completed', process: 'Design' },
+            { id: 5, name: 'Project B2', status: 'In Progress', process: 'Development' },
+            { id: 6, name: 'Project C2', status: 'Planned', process: 'Planning' },
+            { id: 7, name: 'Project A3', status: 'In Progress', process: 'Design' },
+            { id: 8, name: 'Project B3', status: 'Completed', process: 'Development' },
+            { id: 9, name: 'Project C3', status: 'Planned', process: 'Planning' }
+        ];
+
+        const users = [
+            { id: 1, name: 'User1', projects: [1, 2] },
+            { id: 2, name: 'User2', projects: [1, 4, 5] },
+            { id: 3, name: 'User3', projects: [3, 6] }
+        ];
+
+
+        // Function to display projects
+        function displayProjects() {
+            const projectTable = document.getElementById("projectTableBody");
+
+            // Clear existing table rows
+            projectTable.innerHTML = '';
+
+            projects.forEach((project) => {
+                const row = projectTable.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                const cell3 = row.insertCell(2);
+
+                cell1.innerHTML = project.name;
+                cell2.innerHTML = project.process;
+
+                // Highlight based on status
+                cell3.innerHTML = project.status;
+                if (project.status === 'In Progress') {
+                    row.style.backgroundColor = 'yellow';
+                } else if (project.status === 'Completed') {
+                    row.style.backgroundColor = 'green';
+                } else {
+                    row.style.backgroundColor = 'blue';
+                }
+            });
+        }
+
+        // Function to create users
+        function createUser() {
+            const name = prompt("Enter new user name:");
+            const newUser = {
+                id: users.length + 1,
+                name: name,
+                projects: [],
+            };
+
+            users.push(newUser);
+        }
+
+        // Function to compare user activity
+        function compareUserActivity() {
+            const user1Name = prompt("Enter the first user's name to compare:");
+            const user2Name = prompt("Enter the second user's name to compare:");
+
+            const user1 = users.find(u => u.name === user1Name);
+            const user2 = users.find(u => u.name === user2Name);
+
+            if (!user1 || !user2) {
+                alert('User not found.');
+                return;
+            }
+
+            const user1Projects = user1.projects.length;
+            const user2Projects = user2.projects.length;
+
+            alert(`${user1Name} is involved in ${user1Projects} projects.\n${user2Name} is involved in ${user2Projects} projects.`);
+        }
+
+        window.onload = function () {
+            displayProjects();
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1 class="center-align">Project Management Tool</h1>
+
+    <!-- Table to display projects -->
+    <table class="striped">
+        <thead>
+        <tr>
+            <th>Project Name</th>
+            <th>Process</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody id="projectTableBody">
+        <!-- Project rows will be inserted here -->
+        </tbody>
+    </table>
+
+    <!-- Buttons to interact with the system -->
+    <button class="btn waves-effect waves-light" onclick="displayProjects()">Refresh Projects</button>
+    <button class="btn waves-effect waves-light" onclick="createUser()">Create User</button>
+    <button class="btn waves-effect waves-light" onclick="compareUserActivity()">Compare User Activity</button>
+</div>
+
+<!-- Include Materialize JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>

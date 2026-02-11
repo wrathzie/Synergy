@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Diary</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+</head>
+<body>
+<h1>Travel Diary</h1>
+
+<!-- Button to create a new user -->
+<button id="createUserBtn">Create User</button>
+
+<!-- Form to create a new journey -->
+<h2>Create a New Journey</h2>
+<button id="recordJourneyBtn">Record Journey</button>
+<form id="journeyForm" style="display: none;">
+    <label for="username">Username:</label>
+    <input type="text" id="username" required><br>
+
+    <label for="location">Location:</label>
+    <input type="text" id="location" required><br>
+
+    <label for="imageURL">Places Image URL:</label>
+    <input type="text" id="imageURL"><br>
+
+    <label for="cost">Trip Cost:</label>
+    <input type="number" id="cost"><br>
+
+    <label for="culturalHeritage">Cultural Heritage Sites:</label>
+    <input type="text" id="culturalHeritage"><br>
+
+    <label for="easeOfTravel">Ease of Travel Evaluation:</label>
+    <input type="text" id="easeOfTravel"><br>
+
+    <button type="submit">Add Journey</button>
+</form>
+
+
+<!-- Section to view journeys -->
+<h2>View Journeys</h2>
+<button id="viewJourneysBtn" onclick="displayJourneys()">View Journeys</button>
+<div id="journeyList"></div>
+
+<script src="script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>
